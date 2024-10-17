@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique @db.VarChar(255)
+  password  String     @db.VarChar(255)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  status    userStatus @default(ACTIVE)
+
+  @@map("user")
+}
+
+enum userStatus {
+  ACTIVE
+  BANED
+}
+
+model Profile {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @unique
+  role       Role     @default(USER)
+  type       Type     @default(NORMAL)
+  language   Language @default(EN)
+  theme      Theme    @default(LIGHT)
+  username   String?  @unique
+  phone      String?
+  company    String?
+  apiKey     String   @unique @db.VarChar(255)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("profile")
+}
+
+enum Role {
+  USER
+  MOD
+  ADMIN
+}
+
+enum Type {
+  NORMAL
+  ADVANCED
+  PRIORITY
+}
+
+enum Language {
+  EN
+  VI
+}
+
+enum Theme {
+  LIGHT
+  DARK
+}
+
+model Coupon {
+  id              Int         @id @default(autoincrement())
+  code            String      @unique
+  description     String?
+  couponType      CouponType
+  couponValue     Int
+  maxRedemptions  Int         @default(1)
+  redeemedCount   Int         @default(0)
+  isActive        Boolean     @default(true)
+  expiresAt       DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@map("coupon")
+}
+
+//Not use Fix_Amout because other money country
+enum CouponType {
+  INCREASE
+  DISCOUNT
+  REWARD
+}
