@@ -9,7 +9,7 @@ import rateLimit, { FastifyRateLimitOptions } from '@fastify/rate-limit'
 export default fp<FastifyRateLimitOptions>(async (fastify) => {
   fastify.register(rateLimit, {
     max: 3,
-    timeWindow: 1000 //per second
+    timeWindow: 2000 //per second
   })
 
   fastify.setErrorHandler(function (error, request, reply) {
