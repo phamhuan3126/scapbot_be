@@ -42,7 +42,8 @@ model Profile {
 
 enum Role {
   USER
-  MOD
+  SUPPORT
+  DEV
   ADMIN
 }
 
@@ -83,4 +84,28 @@ enum CouponType {
   INCREASE
   DISCOUNT
   REWARD
+}
+
+
+model EntityCaptcha {
+  id        Int               @id @default(autoincrement())
+  provider  CaptchaProvider   @default(CAPTCHA2)
+  api       String            @unique
+  balance   Float
+  createAt  DateTime          @default(now())
+  updateAt  DateTime          @updatedAt
+  status    CaptchaStatus     @default(DIE)
+
+  @@map("entity_captcha")
+}
+
+enum CaptchaProvider {
+  CAPTCHA2
+}
+
+enum CaptchaStatus {
+  FULL
+  MEDIUM
+  LOW
+  DIE
 }

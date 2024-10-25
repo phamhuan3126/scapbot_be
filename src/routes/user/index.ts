@@ -1,5 +1,7 @@
-import { FastifyPluginAsync } from "fastify"
+import { FastifyPluginAsync } from "fastify";
+import { randomBytes } from 'crypto';
 import bcrypt from 'bcrypt';
+
 
 const user: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   const handleError = (error: any, request: any, reply: any) => {
@@ -11,7 +13,7 @@ const user: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     const { email, password } = request.body as { email: string, password: string };
     try {
       const existingUser = await fastify.prisma.user.findFirst({
-        where: { 
+        where: {
           email,
         }
       });
@@ -19,12 +21,24 @@ const user: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         reply.status(400).send({ error: 'User already exists' });
         return;
       }
+      function generateApiKey(length: number = 32): string {
+        return randomBytes(length).toString('hex').slice(0, length);
+      }
       const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = await fastify.prisma.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-        }
+      const newUser = await fastify.prisma.$transaction(async (prisma) => {
+        const createdUser = await prisma.user.create({
+          data: {
+            email,
+            password: hashedPassword,
+          },
+        });
+        await prisma.profile.create({
+          data: {
+            userId: createdUser.id,
+            apiKey: generateApiKey(),
+          },
+        });
+        return createdUser;
       });
       reply.status(201).send(newUser);
     } catch (error) {
