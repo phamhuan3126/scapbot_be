@@ -103,6 +103,41 @@ const user: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
   });
 
+  //GET /user/
+  fastify.get('/', { preHandler: [fastify.authenticate] }, async function (request, reply) {
+    const userToken = request.user as { id: number, email: string };
+    try {
+      const profile = await fastify.prisma.profile.findUnique({
+        where: { userId: userToken.id },
+      });
+      if (profile && profile.role === 'ADMIN') {
+        const users = await fastify.prisma.user.findMany({
+          select: {
+            id: true,
+            email: true,
+            profile: {
+              select: {
+                role: true,
+                type: true,
+              },
+            },
+          },
+        });
+        const result = users.map(user => ({
+          id: user.id,
+          email: user.email,
+          role: user.profile?.role,
+          type: user.profile?.type,
+        }));
+        reply.send(result);
+      } else {
+        reply.status(403).send({ error: 'Access denied' });
+      }
+    } catch (error){
+      handleError(error, request, reply);
+    }
+  });
+
 }
 
 export default user;
