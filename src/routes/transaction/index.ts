@@ -13,7 +13,7 @@ const transaction: FastifyPluginAsync = async (fastify, opts): Promise<void> => 
     description?: string;
     points: number;
   }
-  //POST /transaction/
+  //POST /transaction/ (Lưu ý cần bảo mật thêm endpoint này)
   fastify.post<{ Body: TransactionRequestBody }>('/', { preHandler: [fastify.authenticate] }, async function (request, reply) {
     const userToken = request.user as { id: number, email: string };
     try {
@@ -23,7 +23,7 @@ const transaction: FastifyPluginAsync = async (fastify, opts): Promise<void> => 
       }
       const newTransaction = await fastify.prisma.transaction.create({
         data: {
-          userID: userToken.id,
+          userId: userToken.id,
           type,
           service,
           reference,
@@ -55,6 +55,27 @@ const transaction: FastifyPluginAsync = async (fastify, opts): Promise<void> => 
     }
   })
 
+  // GET /transaction/:id
+  fastify.get('/:id', { preHandler: [fastify.authenticate] }, async function (request, reply) {
+    const { id } = request.params as { id: string };
+    const userToken = request.user as { id: number, email: string };
+    if (Number(id) !== userToken.id) {
+      return reply.status(403).send({ error: 'Forbidden: You can only view your own transaction' });
+    }
+    try {
+      const listTransaction = await fastify.prisma.transaction.findMany({
+        where: { userId: Number(id) }
+      });
+
+      if (listTransaction) {
+        reply.send(listTransaction);
+      } else {
+        reply.status(404).send({ error: 'Transaction not found' });
+      }
+    } catch (error) {
+      handleError(error, request, reply);
+    }
+  });
 
 }
 

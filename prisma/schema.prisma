@@ -14,8 +14,10 @@ model User {
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
   status          userStatus      @default(ACTIVE)
+
   transactions    Transaction[]   // Mỗi User có thể có nhiều Transaction
-  profile         Profile?        
+  profile         Profile?
+  indexrequest    IndexRequest[]
 
   @@map("user")
 }
@@ -91,7 +93,7 @@ enum CouponType {
 
 model Transaction {
   id          Int                 @id @default(autoincrement())
-  userID      Int
+  userId      Int
   type        TransactionType
   service     String
   reference   String              @unique
@@ -99,7 +101,7 @@ model Transaction {
   points      Int
   createdAt   DateTime            @default(now())
   updatedAt   DateTime            @updatedAt
-  user        User                @relation(fields: [userID], references: [id])
+  user        User                @relation(fields: [userId], references: [id])
 
   @@map("transaction")
 }
@@ -108,6 +110,58 @@ enum TransactionType {
   CREDIT
   DEBIT
 }
+
+
+model IndexRequest {
+  id          Int                   @id @default(autoincrement())
+  userId      Int
+  description String?
+  status      IndexRequestStatus    @default(DRAFT)
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+
+  user        User                  @relation(fields: [userId], references: [id])
+  indexlink   IndexLink[]
+
+  @@map("index_request")
+}
+
+enum IndexRequestStatus {
+  DRAFT
+  RUNNING
+  COMPLETE
+}
+
+model IndexLink {
+  id            Int                   @id @default(autoincrement())
+  requestId     Int
+  source        IndexLinkSource       @default(API)
+  url           String                
+  response      Int?
+  information   String?
+  push          Int                   @default(0)
+  status        IndexLinkStatus       @default(PENDING)
+  indexed       Boolean               @default(false)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  indexrequest  IndexRequest          @relation(fields: [requestId], references: [id])
+
+  @@map("index_link")
+}
+
+enum IndexLinkSource {
+  WEB
+  API
+}
+
+enum IndexLinkStatus {
+  PENDING
+  INDEXING
+  DONE
+  FAILED
+}
+
 
 model EntityCaptcha {
   id        Int               @id @default(autoincrement())
