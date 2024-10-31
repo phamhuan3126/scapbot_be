@@ -32,12 +32,15 @@
     "fastify-plugin": "^5.0.0",
     "imap": "^0.8.17",
     "imap-simple": "^1.6.3",
-    "nodemailer": "^6.9.15"
+    "nodemailer": "^6.9.15",
+    "validator": "^13.12.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/imap-simple": "^4.2.9",
     "@types/node": "^22.1.0",
     "@types/nodemailer": "^6.4.16",
+    "@types/validator": "^13.12.2",
     "c8": "^10.1.2",
     "concurrently": "^9.0.0",
     "fastify-tsconfig": "^2.0.0",
