@@ -94,11 +94,9 @@ const indexing: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
           });
 
           if (totalPoints < pointsNeeded) {
-            return reply
-              .status(400)
-              .send({
-                error: "Not enough points to update status to RUNNING.",
-              });
+            return reply.status(400).send({
+              error: "Not enough points to update status to RUNNING.",
+            });
           }
         } else if (
           status &&
@@ -249,10 +247,62 @@ const indexing: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   });
 
   // GET /api/indexing/:requestId
-  fastify.get<{ Params: { requestId: string } }>(
-    "/:requestId",
+  fastify.get<{
+    Params: { requestId: string };
+    Querystring: { status?: string };
+  }>("/:requestId", async (request, reply) => {
+    const { requestId } = request.params;
+    const { status } = request.query;
+    const userId = request.profile?.userId;
+
+    if (!userId) {
+      return reply.status(401).send({ error: "Unauthorized" });
+    }
+
+    try {
+      const userRequest = await fastify.prisma.indexRequest.findUnique({
+        where: { id: parseInt(requestId, 10) },
+        select: { userId: true },
+      });
+      if (!userRequest || userRequest.userId !== userId) {
+        return reply
+          .status(403)
+          .send({ error: "Access denied to this requestId" });
+      }
+
+      const filterConditions: any = { requestId: parseInt(requestId, 10) };
+      if (status) {
+        filterConditions.status = status.toUpperCase();
+      }
+
+      const indexLinks = await fastify.prisma.indexLink.findMany({
+        where: filterConditions,
+        select: {
+          id: true,
+          url: true,
+          status: true,
+          indexed: true,
+          updatedAt: true,
+        },
+      });
+
+      if (indexLinks.length === 0) {
+        return reply
+          .status(404)
+          .send({ error: "No URLs found for this requestId" });
+      }
+
+      return reply.status(200).send(indexLinks);
+    } catch (error) {
+      handleError(error, request, reply);
+    }
+  });
+
+  // DELETE /api/indexing/url/:id
+  fastify.delete<{ Params: { urlId: string } }>(
+    "/url/:urlId",
     async (request, reply) => {
-      const { requestId } = request.params;
+      const { urlId } = request.params;
       const userId = request.profile?.userId;
 
       if (!userId) {
@@ -260,34 +310,40 @@ const indexing: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       }
 
       try {
-        const userRequest = await fastify.prisma.indexRequest.findUnique({
-          where: { id: parseInt(requestId, 10) },
-          select: { userId: true },
-        });
-        if (!userRequest || userRequest.userId !== userId) {
-          return reply
-            .status(403)
-            .send({ error: "Access denied to this requestId" });
-        }
-
-        const indexLinks = await fastify.prisma.indexLink.findMany({
-          where: { requestId: parseInt(requestId, 10) },
+        const indexLink = await fastify.prisma.indexLink.findUnique({
+          where: { id: parseInt(urlId, 10) },
           select: {
-            id: true,
-            url: true,
+            requestId: true,
             status: true,
-            createdAt: true,
-            updatedAt: true,
           },
         });
 
-        if (indexLinks.length === 0) {
-          return reply
-            .status(404)
-            .send({ error: "No URLs found for this requestId" });
+        if (!indexLink) {
+          return reply.status(404).send({ error: "URL not found" });
         }
 
-        return reply.status(200).send(indexLinks);
+        if (indexLink.status !== "PENDING") {
+          return reply
+            .status(400)
+            .send({ error: "Only URLs with PENDING status can be deleted" });
+        }
+
+        const userRequest = await fastify.prisma.indexRequest.findUnique({
+          where: { id: indexLink.requestId },
+          select: { userId: true },
+        });
+
+        if (!userRequest || userRequest.userId !== userId) {
+          return reply
+            .status(403)
+            .send({ error: "Access denied to delete this URL" });
+        }
+
+        await fastify.prisma.indexLink.delete({
+          where: { id: parseInt(urlId, 10) },
+        });
+
+        return reply.status(200).send({ message: "URL deleted successfully" });
       } catch (error) {
         handleError(error, request, reply);
       }

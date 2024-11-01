@@ -53,6 +53,9 @@ export default fp(async (fastify) => {
   // Apply the preHandler hook conditionally
   fastify.addHook("preHandler", async (request, reply) => {
     const url = request.raw.url;
+    if (url && url.startsWith("/docs")) {
+      return; 
+    }
     if (url && url.startsWith("/api/")) {
       await fastify.authenticateApiKey(request, reply);
     } else if (
@@ -64,6 +67,7 @@ export default fp(async (fastify) => {
       await fastify.authenticate(request, reply);
     }
   });
+
 });
 
 // Use TypeScript module augmentation to declare the type of server.authenticate
