@@ -30,7 +30,7 @@ const indexing: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
             },
           });
         if (existingDraftRequest) {
-          return reply.status(400).send({ error: "Too many indexing request" });
+          return reply.status(400).send({ error: "Too many indexing request. You need to update the status for the current request." });
         }
         const newIndexRequest = await fastify.prisma.indexRequest.create({
           data: {
