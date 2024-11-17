@@ -53,17 +53,32 @@ export default fp(async (fastify) => {
   // Apply the preHandler hook conditionally
   fastify.addHook("preHandler", async (request, reply) => {
     const url = request.raw.url;
-    if (url && url.startsWith("/docs")) {
-      return; 
+    const publicRoutes = ['/docs', '/user/signup', '/user/login'];
+    if (url && (url === '/' || url ==='/api/' || publicRoutes.some(route => url.startsWith(route)))) {
+      return;
     }
+
+    interface JWTPayload {
+      id: string;
+    }
+  
     if (url && url.startsWith("/api/")) {
-      await fastify.authenticateApiKey(request, reply);
-    } else if (
-      url &&
-      url !== "/user/signup" &&
-      url !== "/user/login" &&
-      url !== "/"
-    ) {
+      try {
+        // Verify JWT token
+        const decoded = await request.jwtVerify() as JWTPayload;
+        const userId = parseInt(decoded.id, 10);
+        const profile = await fastify.prisma.profile.findUnique({
+          where: { userId: userId }
+        });
+        if (!profile) {
+          throw new Error('Profile not found');
+        }
+        request.profile = profile;
+        return;
+      } catch (err) {
+        await fastify.authenticateApiKey(request, reply);
+      }
+    } else {
       await fastify.authenticate(request, reply);
     }
   });

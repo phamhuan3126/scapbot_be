@@ -20,8 +20,9 @@ const indexing: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         const { description } = request.body;
         const userId = request.profile?.userId;
         if (!userId) {
-          return reply.status(401).send({ error: "Unauthorized" });
+          return reply.status(401).send({ error: "Indexing Unauthorized" });
         }
+        // Cần fix lại là chỉ giới hạn với User type là: NORMAL, Advanced hoặc Priority thì không giới hạn
         const existingDraftRequest =
           await fastify.prisma.indexRequest.findFirst({
             where: {
@@ -54,7 +55,7 @@ const indexing: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         const { description, status } = request.body;
         const userId = request.profile?.userId;
         if (!userId) {
-          return reply.status(401).send({ error: "Unauthorized" });
+          return reply.status(401).send({ error: "Indexing Unauthorized" });
         }
         const indexRequest = await fastify.prisma.indexRequest.findUnique({
           where: { id: parseInt(id, 10) },
@@ -65,7 +66,7 @@ const indexing: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
             .send({ error: "Index request not found or access denied" });
         }
 
-        //Check point need
+        //Check point need (Cần update, bỏ qua check nếu role user là: Admin)
         if (status === "RUNNING" && indexRequest.status === "DRAFT") {
           const totalCredit = await fastify.prisma.transaction.aggregate({
             _sum: {
