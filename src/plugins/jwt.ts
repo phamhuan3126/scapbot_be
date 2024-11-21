@@ -45,7 +45,7 @@ export default fp(async (fastify) => {
       if (!profile) {
         return reply.code(401).send({ message: "apiKey not found" });
       }
-
+      //Truyền thông tin user vào biến dựa vào apiKey
       request.profile = profile;
     }
   );
@@ -73,6 +73,7 @@ export default fp(async (fastify) => {
         if (!profile) {
           throw new Error('Profile not found');
         }
+        //Truyền thông tin user vào biến dựa vào token
         request.profile = profile;
         return;
       } catch (err) {

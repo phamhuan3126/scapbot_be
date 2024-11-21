@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from "fastify";
 import validator from "validator";
 
-const indexing: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
+const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   const handleError = (error: any, request: any, reply: any) => {
     request.log.error(error);
     reply.status(500).send({ error: "Internal Server Error" });
@@ -352,4 +352,4 @@ const indexing: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   );
 };
 
-export default indexing;
+export default index;

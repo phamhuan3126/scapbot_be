@@ -30,7 +30,7 @@
     </style>
   </head>
   <body>
-    <h1>Hướng dẫn API Indexing</h1>
+    <h1>Hướng dẫn API index</h1>
     <p style="font-size: 20px">
       apiKey test:
       <strong style="color: green">03c072389a0ee86942f4bf062bebefc1</strong>
@@ -44,7 +44,7 @@
       </tr>
       <tr>
         <td>POST</td>
-        <td>https://api.scapbot.com/api/indexing/</td>
+        <td>https://api.scapbot.com/api/index/</td>
       </tr>
       <tr>
         <td>Header</td>
@@ -82,7 +82,7 @@
       </tr>
       <tr>
         <td>PATCH</td>
-        <td>https://api.scapbot.com/api/indexing/:id</td>
+        <td>https://api.scapbot.com/api/index/:id</td>
       </tr>
       <tr>
         <td>Header</td>
@@ -113,7 +113,7 @@
       </li>
       <li>
         Khi request có trạng thái RUNNING thì trạng thái các link sẽ là:
-        INDEXING
+        index
       </li>
     </ul>
     <h3>1.3. Xem danh sách request</h3>
@@ -124,7 +124,7 @@
       </tr>
       <tr>
         <td>GET</td>
-        <td>https://api.scapbot.com/api/indexing/</td>
+        <td>https://api.scapbot.com/api/index/</td>
       </tr>
       <tr>
         <td>Parameters</td>
@@ -161,7 +161,7 @@
       </tr>
       <tr>
         <td>POST</td>
-        <td>https://api.scapbot.com/api/indexing/:requestId</td>
+        <td>https://api.scapbot.com/api/index/:requestId</td>
       </tr>
       <tr>
         <td>Header</td>
@@ -197,7 +197,7 @@
       </tr>
       <tr>
         <td>GET</td>
-        <td>https://api.scapbot.com/api/indexing/:requestId</td>
+        <td>https://api.scapbot.com/api/index/:requestId</td>
       </tr>
       <tr>
         <td>Parameters</td>
@@ -217,7 +217,7 @@
     <p>Lưu ý</p>
     <ul>
         <li>
-          Parameters status nhận một trong các giá trị sau: PENDING | INDEXING |
+          Parameters status nhận một trong các giá trị sau: PENDING | index |
           DONE | FAILED
         </li>
       </ul>
@@ -229,7 +229,7 @@
       </tr>
       <tr>
         <td>DELETE</td>
-        <td>https://api.scapbot.com/api/indexing/url/:urlId</td>
+        <td>https://api.scapbot.com/api/index/url/:urlId</td>
       </tr>
       <tr>
         <td>Header</td>

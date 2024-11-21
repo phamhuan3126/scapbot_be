@@ -15,14 +15,13 @@ const ALLOWED_EXTENSIONS = [".jpg", ".png"];
 const UPLOAD_DIR = path.join(process.cwd(), "uploads");
 const REMOTE_DIR = "/media/entity";
 
-const uploadMedia: FastifyPluginAsync = async (
+const media: FastifyPluginAsync = async (
   fastify,
   opts
 ): Promise<void> => {
   // Đảm bảo thư mục uploads tồn tại
   try {
     await fs.promises.mkdir(UPLOAD_DIR, { recursive: true });
-    fastify.log.info(`Created or verified upload directory at: ${UPLOAD_DIR}`);
   } catch (error) {
     fastify.log.error(`Failed to create upload directory: ${error}`);
   }
@@ -152,4 +151,4 @@ const uploadMedia: FastifyPluginAsync = async (
   });
 };
 
-export default uploadMedia;
+export default media;

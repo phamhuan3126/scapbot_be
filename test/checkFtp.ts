@@ -1,7 +1,7 @@
 //Run: ts-node checkFtp.ts
 import { Client } from 'basic-ftp';
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: '../.env' });
 
 async function checkFtpConnection() {
     const client = new Client();
