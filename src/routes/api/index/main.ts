@@ -12,7 +12,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     status?: "DRAFT" | "RUNNING";
   }
 
-  //POST /api/indexing/
+  //POST /api/index/
   fastify.post<{ Body: IndexRequestBody }>(
     "/",
     async function (request, reply) {
@@ -20,7 +20,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         const { description } = request.body;
         const userId = request.profile?.userId;
         if (!userId) {
-          return reply.status(401).send({ error: "Indexing Unauthorized" });
+          return reply.status(401).send({ error: "Index Unauthorized" });
         }
         // Cần fix lại là chỉ giới hạn với User type là: NORMAL, Advanced hoặc Priority thì không giới hạn
         const existingDraftRequest =
@@ -31,7 +31,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
             },
           });
         if (existingDraftRequest) {
-          return reply.status(400).send({ error: "Too many indexing request. You need to update the status for the current request." });
+          return reply.status(400).send({ error: "Too many index request. You need to update the status for the current request." });
         }
         const newIndexRequest = await fastify.prisma.indexRequest.create({
           data: {
@@ -46,7 +46,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
   );
 
-  //PATCH /api/indexing/:id
+  //PATCH /api/index/:id
   fastify.patch<{ Body: IndexRequestBody }>(
     "/:id",
     async function (request, reply) {
@@ -55,7 +55,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         const { description, status } = request.body;
         const userId = request.profile?.userId;
         if (!userId) {
-          return reply.status(401).send({ error: "Indexing Unauthorized" });
+          return reply.status(401).send({ error: "Index Unauthorized" });
         }
         const indexRequest = await fastify.prisma.indexRequest.findUnique({
           where: { id: parseInt(id, 10) },
@@ -136,7 +136,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
   );
 
-  // GET /api/indexing
+  // GET /api/index
   fastify.get("/", async function (request, reply) {
     try {
       const userId = request.profile?.userId;
@@ -169,7 +169,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
   });
 
-  //POST /api/indexing/:requestId
+  //POST /api/index/:requestId
   interface IndexLinkBody {
     urls: string[];
   }
@@ -247,7 +247,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
   });
 
-  // GET /api/indexing/:requestId
+  // GET /api/index/:requestId
   fastify.get<{
     Params: { requestId: string };
     Querystring: { status?: string };
@@ -299,7 +299,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     }
   });
 
-  // DELETE /api/indexing/url/:id
+  // DELETE /api/index/url/:id
   fastify.delete<{ Params: { urlId: string } }>(
     "/url/:urlId",
     async (request, reply) => {
