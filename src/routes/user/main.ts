@@ -1,6 +1,7 @@
 import { FastifyPluginAsync } from "fastify";
 import { randomBytes } from "crypto";
 import bcrypt from "bcrypt";
+import { login } from "./login";
 
 const user: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   const handleError = (error: any, request: any, reply: any) => {
@@ -49,29 +50,8 @@ const user: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   });
   // POST /user/login
   fastify.post("/login", async function (request, reply) {
-    const { email, password } = request.body as {
-      email: string;
-      password: string;
-    };
-    try {
-      const user = await fastify.prisma.user.findUnique({
-        where: { email },
-      });
-      if (user && (await bcrypt.compare(password, user.password))) {
-        const token = fastify.jwt.sign({ id: user.id, email: user.email });
-        reply.setCookie("token", token, {
-          path: "/",
-          httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
-          sameSite: "strict",
-        });
-        reply.send({ message: "Login successful" });
-      } else {
-        reply.status(401).send({ error: "Invalid email or password" });
-      }
-    } catch (error) {
-      handleError(error, request, reply);
-    }
+    //Sử dụng login.ts
+    await login(fastify, request, reply);
   });
 
   // POST /user/logout

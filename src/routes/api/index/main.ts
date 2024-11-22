@@ -4,7 +4,7 @@ import validator from "validator";
 const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
   const handleError = (error: any, request: any, reply: any) => {
     request.log.error(error);
-    reply.status(500).send({ error: "Internal Server Error" });
+    reply.status(500).send({ error: "Index - Internal Server Error" });
   };
 
   interface IndexRequestBody {
