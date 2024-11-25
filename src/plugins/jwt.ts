@@ -83,7 +83,6 @@ export default fp(async (fastify) => {
       await fastify.authenticate(request, reply);
     }
   });
-
 });
 
 // Use TypeScript module augmentation to declare the type of server.authenticate

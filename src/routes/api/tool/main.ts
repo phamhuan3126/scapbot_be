@@ -11,8 +11,10 @@ const tool: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     request.log.error(error);
     reply.status(500).send({ error: "Tool - Internal Server Error" });
   };
+  //Thêm mới user
+
   //Kiểm tra user
-  fastify.post("/user-verify", async function (request, reply) {
+  fastify.post("/verify-user", async function (request, reply) {
     try {
       const profile = request.profile; // Chỉ user có quyền ADMIN mới được kiểm tra
       if (profile && profile.role === "ADMIN") {

@@ -144,7 +144,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
         status?: "DRAFT" | "RUNNING" | "COMPLETE";
       };
       if (!userId) {
-        return reply.status(401).send({ error: "Unauthorized" });
+        return reply.status(401).send({ error: "Index Unauthorized" });
       }
       const indexRequests = await fastify.prisma.indexRequest.findMany({
         where: {
@@ -182,7 +182,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     const { urls } = request.body;
     const userId = request.profile?.userId;
     if (!userId) {
-      return reply.status(401).send({ error: "Unauthorized" });
+      return reply.status(401).send({ error: "Index Unauthorized" });
     }
 
     try {
@@ -257,7 +257,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
     const userId = request.profile?.userId;
 
     if (!userId) {
-      return reply.status(401).send({ error: "Unauthorized" });
+      return reply.status(401).send({ error: "Index Unauthorized" });
     }
 
     try {
@@ -307,7 +307,7 @@ const index: FastifyPluginAsync = async (fastify, opts): Promise<void> => {
       const userId = request.profile?.userId;
 
       if (!userId) {
-        return reply.status(401).send({ error: "Unauthorized" });
+        return reply.status(401).send({ error: "Index Unauthorized" });
       }
 
       try {
