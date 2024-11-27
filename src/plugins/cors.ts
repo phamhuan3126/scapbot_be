@@ -16,7 +16,7 @@ export default fp<FastifyCorsOptions>(async (fastify) => {
   // Cấu hình origins cho non-API routes
   const corsOrigins =
     NODE_ENV === "development"
-      ? ["http://localhost:3000", "http://localhost:3001", ...ALLOWED_ORIGINS]
+      ? ["http://localhost:3000", "http://localhost:3001", "http://localhost:3002", ...ALLOWED_ORIGINS]
       : ALLOWED_ORIGINS;
 
   // Danh sách routes không cần kiểm tra CORS
