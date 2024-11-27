@@ -15,7 +15,7 @@ export const signupSchema = z.object({
   password: z
     .string()
     .min(6, "Password must be at least 6 characters long")
-    .max(100, "Password cannot exceed 100 characters"),
+    .max(50, "Password cannot exceed 50 characters"),
 });
 
 // Export type for TypeScript support
