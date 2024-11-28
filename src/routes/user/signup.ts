@@ -18,20 +18,6 @@ export async function signup(
     // Validate request body with Zod
     const body = signupSchema.parse(request.body);
     const { username, email, password } = body;
-    // Check email in database
-    const existingEmail = await fastify.prisma.user.findFirst({
-      where: {
-        email,
-      },
-    });
-    if (existingEmail) {
-      reply.status(409).send({
-        statusCode: 409,
-        message: "User with this email already exists",
-        field: "email",
-      });
-      return;
-    }
 
     //Check username in database
     const existingUsername = await fastify.prisma.profile.findFirst({
@@ -44,6 +30,21 @@ export async function signup(
         statusCode: 409,
         message: "Username already taken",
         field: "username",
+      });
+      return;
+    }
+
+    // Check email in database
+    const existingEmail = await fastify.prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    if (existingEmail) {
+      reply.status(409).send({
+        statusCode: 409,
+        message: "User with this email already exists",
+        field: "email",
       });
       return;
     }
