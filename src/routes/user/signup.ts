@@ -25,7 +25,11 @@ export async function signup(
       },
     });
     if (existingEmail) {
-      reply.status(400).send({ error: "User with this email already exists" });
+      reply.status(409).send({
+        statusCode: 409,
+        message: "User with this email already exists",
+        field: "email",
+      });
       return;
     }
 
@@ -36,7 +40,11 @@ export async function signup(
       },
     });
     if (existingUsername) {
-      reply.status(400).send({ error: "Username already taken" });
+      reply.status(409).send({
+        statusCode: 409,
+        message: "Username already taken",
+        field: "username",
+      });
       return;
     }
 
